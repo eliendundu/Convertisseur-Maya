@@ -1,0 +1,146 @@
+
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Convertisseur Maya</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f1e5;
+      padding: 20px;
+      color: #3b2f2f;
+    }
+    h1 {
+      text-align: center;
+      color: #5a3e2b;
+    }
+    .container {
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 20px;
+      background-color: #fff;
+      border: 2px solid #c9b79c;
+      border-radius: 8px;
+    }
+    input[type="date"] {
+      padding: 10px;
+      width: 100%;
+      margin-bottom: 10px;
+    }
+    button {
+      padding: 10px 20px;
+      background-color: #5a3e2b;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    .resultat {
+      margin-top: 20px;
+      font-size: 18px;
+      white-space: pre-wrap;
+    }
+  </style>
+</head>
+<body>
+  <h1>Convertisseur Date Grégorienne → Calendrier Maya</h1>
+  <div class="container">
+    <label for="date">Choisis une date :</label>
+    <input type="date" id="date">
+    <button onclick="convertirDate()">Convertir</button>
+    <div class="resultat" id="resultat"></div>
+  </div>
+
+  <script>
+    function convertirDate() {
+      const dateInput = document.getElementById("date").value;
+      if (!dateInput) return;
+
+      const dateChoisie = new Date(dateInput + 'T00:00:00');
+      const dateMayaZero = new Date(-3113, 7, 11); // 11 août 3114 av. J.-C. (corrélé GMT)
+      const msParJour = 86400000;
+      const differenceJours = Math.round((dateChoisie - dateMayaZero) / msParJour);
+
+      let jours = differenceJours;
+      let baktun = Math.floor(jours / 144000);
+      jours %= 144000;
+      let katun = Math.floor(jours / 7200);
+      jours %= 7200;
+      let tun = Math.floor(jours / 360);
+      jours %= 360;
+      let uinal = Math.floor(jours / 20);
+      let kin = jours % 20;
+      const compteLong = `${baktun}.${katun}.${tun}.${uinal}.${kin}`;
+
+      // Tzolk'in (260 jours)
+      const nomsTzolkin = ["Imix", "Ik'", "Ak'b'al", "K'an", "Chikchan", "Kimi", "Manik'", "Lamat", "Muluk", "Ok", "Chuwen", "Eb'", "B'en", "Ix", "Men", "Kib'", "Kab'an", "Etz'nab'", "Kawak", "Ajaw"];
+      const interpretationsTzolkin = {
+        "Imix": "Commencement, l'eau, fertilité",
+        "Ik'": "Air, communication, esprit",
+        "Ak'b'al": "Nuit, mystère, intuition",
+        "K'an": "Abondance, jeunesse, semence",
+        "Chikchan": "Vie, force, passion",
+        "Kimi": "Mort, renaissance, repos",
+        "Manik'": "Guérison, chasse, protection",
+        "Lamat": "Beauté, abondance, harmonie",
+        "Muluk": "Eau, émotions, offrande",
+        "Ok": "Amour, loyauté, guidance",
+        "Chuwen": "Créativité, art, jeu",
+        "Eb'": "Voyage, destinée, opportunité",
+        "B'en": "Croissance, autorité, direction",
+        "Ix": "Magie, féminité, jaguar",
+        "Men": "Vision, aigle, avenir",
+        "Kib'": "Sagesse, pardon, transformation",
+        "Kab'an": "Terre, mouvement, intelligence",
+        "Etz'nab'": "Reflet, vérité, décision",
+        "Kawak": "Tempête, purification, énergie",
+        "Ajaw": "Soleil, illumination, maître"
+      };
+      const numeroTzolkin = ((differenceJours + 3) % 13) + 1;
+      const nomTzolkin = nomsTzolkin[(differenceJours + 19) % 20];
+      const significationTzolkin = interpretationsTzolkin[nomTzolkin];
+
+      // Haab' (365 jours)
+      const nomsHaab = ["Pop", "Wo'", "Sip", "Sotz'", "Sek", "Xul", "Yaxk'in", "Mol", "Ch'en", "Yax", "Sak'", "Keh", "Mak", "K'ank'in", "Muwan", "Pax", "K'ayab", "Kumk'u", "Wayeb"];
+      const interpretationsHaab = {
+        "Pop": "Leadership, ordre, autorité",
+        "Wo'": "Introspection, obscurité, spiritualité",
+        "Sip": "Conflit, chasse, transformation",
+        "Sotz'": "Chauve-souris, mort, nuit",
+        "Sek": "Équilibre, décision, changement",
+        "Xul": "Renouveau, chiens-guides, retour",
+        "Yaxk'in": "Nouveaux départs, soleil, chaleur",
+        "Mol": "Réunion, pluie, communauté",
+        "Ch'en": "Caverne, intérieur, repos",
+        "Yax": "Verdure, jeunesse, espoir",
+        "Sak'": "Pureté, lumière, clarté",
+        "Keh": "Cerf, forêt, cycle de la nature",
+        "Mak": "Mystère, dissimulation, protection",
+        "K'ank'in": "Chaleur sèche, contemplation, mémoire",
+        "Muwan": "Oiseau hibou, feu, vision",
+        "Pax": "Guerre, force, expansion",
+        "K'ayab": "Lune, rythme, féminité",
+        "Kumk'u": "Maïs, maturité, récolte",
+        "Wayeb": "Chaos, transition, jours sacrés"
+      };
+      let jourHaab = (differenceJours + 348) % 365;
+      let moisHaab = Math.floor(jourHaab / 20);
+      let jourDuMoisHaab = jourHaab % 20;
+      if (moisHaab === 18) {
+        jourDuMoisHaab = jourHaab - (18 * 20);
+      }
+      const nomHaab = nomsHaab[moisHaab];
+      const significationHaab = interpretationsHaab[nomHaab];
+
+      document.getElementById("resultat").innerText =
+        `Date maya (Compte Long) : ${compteLong}\n\n` +
+        `Tzolk'in : ${numeroTzolkin} ${nomTzolkin}\n` +
+        `→ Signification : ${significationTzolkin}\n\n` +
+        `Haab' : ${jourDuMoisHaab} ${nomHaab}\n` +
+        `→ Signification : ${significationHaab}`;
+    }
+  </script>
+</body>
+</html>
